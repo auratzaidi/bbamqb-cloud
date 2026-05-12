@@ -226,6 +226,23 @@ textarea{min-height:90px}.row{display:grid;grid-template-columns:repeat(2,1fr);g
 @media print{.sidebar,.btn,.pager,.no-print{display:none}.main{margin:0;width:100%;padding:0}.card{box-shadow:none;border:0}body{background:white}}
 """
 
+
+SAVE_LOCK_JS = """
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('form').forEach(function(form) {
+    form.addEventListener('submit', function() {
+      var buttons = form.querySelectorAll('button[type="submit"], button:not([type])');
+      buttons.forEach(function(btn) {
+        btn.disabled = true;
+        btn.innerHTML = "Saving... ⏳";
+      });
+    });
+  });
+});
+</script>
+"""
+
 def page(title, body, user=None):
     nav = ""
     if user:
@@ -236,25 +253,22 @@ def page(title, body, user=None):
         nav = f"""<aside class="sidebar"><div class="brand">BBAMQB<small>Fast Operations Suite</small></div>
 <nav>{menu}</nav>
 <div class="userbox"><b>{escape(user['username'])}</b><br><small>{escape(user['role'])}</small></div></aside>"""
-    return f"<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>{escape(title)}</title><style>{CSS}</style></head><body><div class='{'layout' if user else 'login-wrap'}'>{nav}<main class='{'main' if user else ''}'>{body}</main></div>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('form').forEach(function(form) {
-    form.addEventListener('submit', function() {
-      var buttons = form.querySelectorAll('button[type="submit"], button:not([type])');
-      buttons.forEach(function(btn) {
-        btn.disabled = true;
-        if (!btn.dataset.originalHtml) {
-          btn.dataset.originalHtml = btn.innerHTML;
-        }
-        btn.classList.add('saving');
-        btn.innerHTML = "<span class='save-text'>Saving...</span><span class='spinner'>⏳</span>";
-      });
-    });
-  });
-});
-</script>
-</body></html>"
+    shell_class = "layout" if user else "login-wrap"
+    main_class = "main" if user else ""
+    return f"""<!doctype html>
+<html>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>{escape(title)}</title>
+<style>{CSS}</style>
+</head>
+<body>
+<div class='{shell_class}'>{nav}<main class='{main_class}'>{body}</main></div>
+{SAVE_LOCK_JS}
+</body>
+</html>"""
+
 
 def redirect(path):
     return (302, {"Location": path}, b"")
