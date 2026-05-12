@@ -1,4 +1,4 @@
 flask
 reportlab
-psycopg2-binary
+psycopg[binary]
 gunicorn
