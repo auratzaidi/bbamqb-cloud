@@ -10,7 +10,7 @@ from datetime import datetime
 from html import escape
 from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlparse, parse_qs, unquote, urlencode
+from urllib.parse import urlparse, parse_qs, unquote, urlencode, quote
 import pg8000.dbapi
 
 HOST = "0.0.0.0"
